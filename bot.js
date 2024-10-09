@@ -149,6 +149,13 @@ function splitMessage(content) {
 client.on("messageCreate", async (message) => {
   // Check if the message is from the bot itself
   if (message.author.id === client.user.id) return;
+  // Check if the message is a DM
+  if (message.channel.type === "DM") {
+    await message.reply(
+      "**You can only use me in the Verifried Discord Server**"
+    );
+    return; // Exit the function if it's a DM
+  }
 
   // Check if the bot is mentioned
   if (message.mentions.has(client.user)) {
