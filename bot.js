@@ -10,8 +10,8 @@ const client = new Client({
   ],
 });
 
-const TOKEN =
-  "MTI5MzUzODAyNTY0MDMwMDY2NQ.GvN9tW.y6gOXPXTwKXoXKzSgl2KOancaJ1RvNleVSgr2Q"; // Replace with your actual bot token
+require("dotenv").config();
+const TOKEN = process.env.TOKEN; // Access the token from the environment variable
 
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
