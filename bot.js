@@ -15,6 +15,17 @@ const TOKEN = process.env.TOKEN; // Access the token from the environment variab
 
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+
+  //Set custom status
+  client.user.setPresence({
+    status: "online", // Can be 'online', 'idle', 'dnd', or 'invisible'
+    activities: [
+      {
+        name: "GPT-4", // The message you want to display
+        type: "PLAYING", // Activity type: 'PLAYING', 'STREAMING', 'LISTENING', 'WATCHING'
+      },
+    ],
+  });
 });
 
 // Function to send messages to both APIs
