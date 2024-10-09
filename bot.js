@@ -1,4 +1,9 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  ActivityType,
+  Activity,
+} = require("discord.js");
 const express = require("express");
 const axios = require("axios"); // Import axios for making HTTP requests
 const app = express();
@@ -16,16 +21,23 @@ const TOKEN = process.env.TOKEN; // Access the token from the environment variab
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
-  //Set custom status
-  client.user.setPresence({
-    status: "online", // Can be 'online', 'idle', 'dnd', or 'invisible'
-    activities: [
-      {
-        name: "GPT-4", // The message you want to display
-        type: "PLAYING", // Activity type: 'PLAYING', 'STREAMING', 'LISTENING', 'WATCHING'
-      },
-    ],
-  });
+  const activities = [
+    {
+      name: "Try leeyos.com",
+      type: ActivityType.WATCHING,
+      url: "https://www.leeyos.com",
+    },
+    {
+      name: "Find valorant teams",
+      type: ActivityType.WATCHING,
+      url: "https://www.valoparty.com",
+    },
+  ];
+
+  setInterval(() => {
+    const random = Math.floor(Math.random() * activities.length);
+    client.user.setActivity(activities[random]);
+  }, 10000);
 });
 
 // Function to send messages to both APIs
