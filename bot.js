@@ -159,6 +159,14 @@ client.on("messageCreate", async (message) => {
       .join(" ") // Join them back into a single string
       .trim(); // Trim any extra whitespace
 
+    // Check if the user only mentioned the bot (no additional text)
+    if (userMessage === "") {
+      await message.reply(
+        "**Command:** @VerifriedBot <your_query_here>\n\n*Note: Bot may take time to process your query. Please be patient*"
+      );
+      return; // Exit the function early
+    }
+
     // Send an initial reply indicating processing
     const initialReply = await message.reply(
       `**You asked:** ${userMessage}\n***Processing your request, please wait...***`
@@ -232,7 +240,7 @@ client.on("messageCreate", async (message) => {
 
         // Send each message chunk
         for (const msg of messages) {
-          await message.channel.send(`**${msg}**`);
+          await message.channel.send(`${msg}`);
         }
       }
     } else {
