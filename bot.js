@@ -114,6 +114,27 @@ async function getFileData(fileUrl) {
   }
 }
 
+function splitMessage(content) {
+  const messages = [];
+  let currentMessage = "";
+
+  // Split the content into chunks of 2000 characters or fewer
+  const words = content.split(" ");
+  for (const word of words) {
+    if (currentMessage.length + word.length + 1 <= 2000) {
+      currentMessage += (currentMessage.length ? " " : "") + word;
+    } else {
+      messages.push(currentMessage);
+      currentMessage = word;
+    }
+  }
+  if (currentMessage) {
+    messages.push(currentMessage);
+  }
+
+  return messages;
+}
+
 client.on("messageCreate", async (message) => {
   // Check if the message is from the bot itself
   if (message.author.id === client.user.id) return;
@@ -128,7 +149,7 @@ client.on("messageCreate", async (message) => {
       .trim(); // Trim any extra whitespace
 
     // Send an initial reply indicating processing
-    await message.reply(
+    const initialReply = await message.reply(
       `**You asked:** ${userMessage}\n***Processing your request, please wait...***`
     );
 
@@ -137,13 +158,17 @@ client.on("messageCreate", async (message) => {
 
     // Prepare the response text
     if (apiResponse) {
+      // Edit the initial reply to remove the processing text
+      await initialReply.edit(`**You asked:** ${userMessage}`);
+
       // Extract the relevant part of the response
       let responseText = apiResponse
         .replace(/TOOL_CALL:.*? /g, "") // Remove the TOOL_CALL prefix
         .replace(/browseWeb/g, ""); // Remove the browseWeb part
 
       // Use the extractImageUrl function to get the image URL
-      const imageUrl = extractDeets(responseText, "![", "](");
+      const imageUrl = extractDeets(responseText, "](", ")");
+
       const fileUrl = extractDeets(
         responseText,
         "(/api/openai/downloadFile?fileId=file-",
@@ -151,7 +176,8 @@ client.on("messageCreate", async (message) => {
       );
 
       // Check if an image URL was found
-      if (imageUrl) {
+      if (extractDeets(responseText, "![", " for")) {
+        console.log("\n\nImage URL:", imageUrl);
         // Send the image directly as an embedded image
         await message.channel.send({
           content: `**Here is the image you requested:**`,
@@ -189,8 +215,14 @@ client.on("messageCreate", async (message) => {
           await message.reply("There was an error retrieving the file.");
         }
       } else {
-        // If no image URL or file URL is found, send the response text
-        await message.channel.send(`**${responseText}**`);
+        // If no image URL or file URL is found, split the response text and send it
+        // Split the response text into chunks of 2000 characters
+        const messages = splitMessage(responseText);
+
+        // Send each message chunk
+        for (const msg of messages) {
+          await message.channel.send(`**${msg}**`);
+        }
       }
     } else {
       await message.reply("There was an error processing your request.");
