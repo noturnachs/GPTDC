@@ -28,7 +28,7 @@ client.once("ready", () => {
       url: "https://www.leeyos.com",
     },
     {
-      name: "Find valorant teams",
+      name: "Find valorant teams at valoparty.com",
       type: ActivityType.WATCHING,
       url: "https://www.valoparty.com",
     },
